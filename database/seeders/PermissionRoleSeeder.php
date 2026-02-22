@@ -1,7 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Enums\Permission\PermissionEnum;
+use App\Enums\Role\RoleEnum;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -13,14 +16,14 @@ class PermissionRoleSeeder extends Seeder
         Role::query()->truncate();
         Permission::query()->truncate();
 
-        $admin = Role::query()->create(['name' => 'admin']);
-        $user = Role::query()->create(['name' => 'user']);
+        $admin = Role::query()->create(['name' => RoleEnum::ADMIN->getValue()]);
+        $user = Role::query()->create(['name' => RoleEnum::USER->getValue()]);
 
-        $usersCrud = Permission::query()->create(['name' => 'users.crud']);
-        $tasksCrud = Permission::query()->create(['name' => 'tasks.crud']);
+        $usersCrud = Permission::query()->create(['name' => PermissionEnum::USERS_CRUD->getValue()]);
+        $tasksCrud = Permission::query()->create(['name' => PermissionEnum::TASKS_CRUD->getValue()]);
 
-        $userManage = Permission::query()->create(['name' => 'user.manage']);
-        $tasksManage = Permission::query()->create(['name' => 'tasks.manage']);
+        $userManage = Permission::query()->create(['name' => PermissionEnum::USER_MANAGE->getValue()]);
+        $tasksManage = Permission::query()->create(['name' => PermissionEnum::TASKS_MANAGE->getValue()]);
 
         $admin->givePermissionTo($usersCrud);
         $admin->givePermissionTo($tasksCrud);
