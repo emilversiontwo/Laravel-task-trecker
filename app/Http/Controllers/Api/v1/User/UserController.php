@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\v1\User;
 
-use App\Enums\Role\RoleEnum;
+use App\Enums\Permission\PermissionEnum;
 use App\Exceptions\AppLogicException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\v1\User\StoreUserRequest;
@@ -48,7 +48,7 @@ class UserController extends Controller
     {
         if (
             $request->user()->id !== $user->id &&
-            !$request->user()->hasRole(RoleEnum::ADMIN->getValue())
+            !$request->user()->hasPermissionTo(PermissionEnum::USERS_CRUD->getValue())
         ) {
             throw new AppLogicException('Insufficient permissions', ResponseCode::HTTP_FORBIDDEN);
         }
@@ -67,7 +67,7 @@ class UserController extends Controller
     {
         if (
             $request->user()->id !== $user->id &&
-            !$request->user()->hasRole(RoleEnum::ADMIN->getValue())
+            !$request->user()->hasPermissionTo(PermissionEnum::USERS_CRUD->getValue())
         ) {
             throw new AppLogicException('Insufficient permissions', ResponseCode::HTTP_FORBIDDEN);
         }
@@ -88,7 +88,7 @@ class UserController extends Controller
     {
         if (
             $request->user()->id !== $user->id &&
-            !$request->user()->hasRole(RoleEnum::ADMIN->getValue())
+            !$request->user()->hasPermissionTo(PermissionEnum::USERS_CRUD->getValue())
         ) {
             throw new AppLogicException('Insufficient permissions', ResponseCode::HTTP_FORBIDDEN);
         }
