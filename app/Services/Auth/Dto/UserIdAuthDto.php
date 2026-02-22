@@ -1,11 +1,12 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Services\Auth\Dto;
 
 use App\Helpers\Dto\Dto;
 use App\Models\User;
 
-class GetSessionsAuthDto extends Dto
+class UserIdAuthDto extends Dto
 {
-    public User $user;
+    public int $user_id;
 }

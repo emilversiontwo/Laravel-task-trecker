@@ -1,21 +1,17 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Services\Auth\Service;
 
-use App\Http\Requests\Api\v1\Auth\LoginAuthRequest;
-use App\Http\Requests\Api\v1\Auth\LogoutAuthRequest;
-use App\Http\Requests\Api\v1\Auth\RegistrationAuthRequest;
+use App\Enums\Role\RoleEnum;
 use App\Models\User;
-use App\Services\Auth\Dto\GetSessionsAuthDto;
 use App\Services\Auth\Dto\LoginAuthDto;
-use App\Services\Auth\Dto\LogoutAllAuthDto;
 use App\Services\Auth\Dto\LogoutAuthDto;
 use App\Services\Auth\Dto\RegistrationAuthDto;
+use App\Services\Auth\Dto\UserIdAuthDto;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
-use Laravel\Sanctum\PersonalAccessToken;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AuthService
 {
@@ -35,7 +31,7 @@ class AuthService
 
         $user->save();
 
-        $user->assignRole('user');
+        $user->assignRole(RoleEnum::USER->getValue());
 
         return $user->createToken($dto->token_name)->plainTextToken;
     }
@@ -66,7 +62,7 @@ class AuthService
      */
     public function logout(LogoutAuthDto $dto): void
     {
-        if ($dto->id){
+        if ($dto->id) {
             $dto->user->tokens()->where('id', $dto->id)->firstOrFail()->delete();
         } else {
             $dto->user->currentAccessToken()->delete();
@@ -75,21 +71,23 @@ class AuthService
 
     /**
      * Get all token records
-     * @param GetSessionsAuthDto $dto
+     * @param UserIdAuthDto $dto
      * @return Collection
      */
-    public function getSessions(GetSessionsAuthDto $dto): Collection
+    public function getSessions(UserIdAuthDto $dto): Collection
     {
-        return $dto->user->tokens()->get()->makeHidden('token');
+        $user = User::query()->findOrFail($dto->user_id);
+        return $user->tokens()->get()->makeHidden('token');
     }
 
     /**
      * Delete all tokens
-     * @param LogoutAllAuthDto $dto
+     * @param UserIdAuthDto $dto
      * @return void
      */
-    public function logoutAll(LogoutAllAuthDto $dto): void
+    public function logoutAll(UserIdAuthDto $dto): void
     {
-        $dto->user->tokens()->delete();
+        $user = User::query()->findOrFail($dto->user_id);
+        $user->tokens()->delete();
     }
 }

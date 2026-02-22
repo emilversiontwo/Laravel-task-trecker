@@ -1,8 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Http\Requests\Api\v1\Auth;
 
+use App\Services\Auth\Dto\RegistrationAuthDto;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
 
 class RegistrationAuthRequest extends FormRequest
 {
@@ -18,5 +21,15 @@ class RegistrationAuthRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+    }
+
+    public function toDto(): RegistrationAuthDto
+    {
+        $data = $this->validated();
+
+        return new RegistrationAuthDto([
+            ...$data,
+            'token_name' => $this->device_name ?? $this->userAgent() ?? Str::random(20),
+        ]);
     }
 }
