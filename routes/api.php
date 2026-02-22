@@ -2,6 +2,7 @@
 
 use App\Enums\Permission\PermissionEnum;
 use App\Http\Controllers\Api\v1\Auth\AuthController;
+use App\Http\Controllers\Api\v1\Task\TaskController;
 use App\Http\Controllers\Api\v1\User\UserController;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Middleware\PermissionMiddleware;
@@ -27,6 +28,32 @@ Route::group(['prefix' => 'v1'], function () {
     });
 
     Route::group([
+        'middleware' => [
+            'auth:sanctum',
+            PermissionMiddleware::using([
+                PermissionEnum::TASKS_MANAGE->getValue(),
+                PermissionEnum::TASKS_CRUD->getValue()
+            ]),
+        ],
+        'prefix' => 'tasks',
+    ], function () {
+        Route::get('/', [TaskController::class, 'index'])
+            ->name('api.v1.tasks.index');
+
+        Route::get('/{task}', [TaskController::class, 'show'])
+            ->name('api.v1.tasks.show');
+
+        Route::post('/', [TaskController::class, 'store'])
+            ->name('api.v1.tasks.store');
+
+        Route::patch('/{task}', [TaskController::class, 'update'])
+            ->name('api.v1.tasks.update');
+
+        Route::delete('/{task}', [TaskController::class, 'destroy'])
+            ->name('api.v1.tasks.destroy');
+    });
+
+    Route::group([
         'prefix' => 'users',
         'middleware' => 'auth:sanctum',
     ], function () {
@@ -35,13 +62,17 @@ Route::group(['prefix' => 'v1'], function () {
         ], function () {
             Route::get('/', [UserController::class, 'index'])
                 ->name('api.v1.users.index');
+
             Route::get('/{user}', [UserController::class, 'show'])
                 ->name('api.v1.users.show');
+
             Route::post('/', [UserController::class, 'store'])
                 ->name('api.v1.users.store');
+
             Route::delete('/{user}', [UserController::class, 'destroy'])
                 ->name('api.v1.users.destroy');
         });
+
         Route::patch('/{user}', [UserController::class, 'update'])
             ->name('api.v1.users.update')
             ->middleware(PermissionMiddleware::using([
